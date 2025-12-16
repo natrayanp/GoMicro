@@ -1,0 +1,24 @@
+FROM golang:1.25.5-alpine
+
+WORKDIR /app
+
+RUN apk add --no-cache protoc protobuf-dev make git bash curl
+
+# Install codegen tools
+RUN go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
+RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+RUN go install github.com/air-verse/air@latest
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+
+RUN protoc --go_out=. --go-grpc_out=. proto/*.proto
+COPY sql/sqlc.yaml ./sqlc.yaml
+RUN sqlc generate -f ./sqlc.yaml
+
+EXPOSE 50051 8080
+
+CMD ["air", "-c", ".air.toml"]

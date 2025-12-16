@@ -1,0 +1,1074 @@
+Updated Hybrid Architecture Structure
+
+your-org/
+├── apps/                              # Microservices applications
+│   ├── auth-service/                  # 1. Authentication Service (gRPC + Events)
+│   │   ├── internal/
+│   │   │   ├── domain/
+│   │   │   │   ├── entities/
+│   │   │   │   │   ├── user.go
+│   │   │   │   │   ├── session.go
+│   │   │   │   │   └── token.go
+│   │   │   │   ├── valueobjects/
+│   │   │   │   │   ├── email.go
+│   │   │   │   │   └── password.go
+│   │   │   │   ├── enums/
+│   │   │   │   │   ├── user_status.go
+│   │   │   │   │   ├── auth_provider.go
+│   │   │   │   │   └── event_type.go
+│   │   │   │   └── errors/
+│   │   │   │       └── auth_errors.go
+│   │   │   │
+│   │   │   ├── storage/
+│   │   │   │   ├── interfaces/
+│   │   │   │   │   ├── user_repository.go
+│   │   │   │   │   └── session_repository.go
+│   │   │   │   ├── postgres/
+│   │   │   │   │   ├── store.go
+│   │   │   │   │   ├── repositories/
+│   │   │   │   │   │   ├── user_repository.go
+│   │   │   │   │   │   └── session_repository.go
+│   │   │   │   │   ├── sqlc/
+│   │   │   │   │   ├── errors/
+│   │   │   │   │   └── connection.go
+│   │   │   │   └── cache/
+│   │   │   │       └── redis_cache.go
+│   │   │   │
+│   │   │   ├── auth/                  # Vendor-agnostic auth
+│   │   │   │   ├── interfaces/
+│   │   │   │   │   ├── auth_provider.go
+│   │   │   │   │   └── token_provider.go
+│   │   │   │   ├── providers/
+│   │   │   │   │   ├── firebase/
+│   │   │   │   │   │   ├── firebase_provider.go
+│   │   │   │   │   │   └── config.go
+│   │   │   │   │   └── jwt/
+│   │   │   │   │       ├── jwt_provider.go
+│   │   │   │   │       └── token_manager.go
+│   │   │   │   └── factory/
+│   │   │   │       └── provider_factory.go
+│   │   │   │
+│   │   │   ├── core/
+│   │   │   │   ├── services/
+│   │   │   │   │   ├── auth_service.go
+│   │   │   │   │   └── user_service.go
+│   │   │   │   ├── ports/
+│   │   │   │   │   ├── auth_service_port.go
+│   │   │   │   │   └── user_service_port.go
+│   │   │   │   ├── aggregates/
+│   │   │   │   │   └── user_aggregate.go
+│   │   │   │   └── events/            # DOMAIN EVENTS
+│   │   │   │       ├── user_registered.go
+│   │   │   │       ├── user_logged_in.go
+│   │   │   │       ├── password_changed.go
+│   │   │   │       ├── email_verified.go
+│   │   │   │       └── user_updated.go
+│   │   │   │
+│   │   │   ├── api/
+│   │   │   │   ├── grpc/              # gRPC API (SYNCHRONOUS)
+│   │   │   │   │   ├── server.go
+│   │   │   │   │   ├── handlers/
+│   │   │   │   │   │   └── auth_handler.go
+│   │   │   │   │   └── interceptors/
+│   │   │   │   │       ├── logging.go
+│   │   │   │   │       ├── recovery.go
+│   │   │   │   │       └── auth_interceptor.go
+│   │   │   │   │
+│   │   │   │   ├── events/            # EVENT PUBLISHERS (ASYNC)
+│   │   │   │   │   ├── publisher.go
+│   │   │   │   │   ├── user_events_publisher.go
+│   │   │   │   │   └── auth_events_publisher.go
+│   │   │   │   │
+│   │   │   │   ├── health/
+│   │   │   │   │   └── health.go
+│   │   │   │   │
+│   │   │   │   └── consumers/         # EVENT CONSUMERS (optional)
+│   │   │   │       └── audit_consumer.go
+│   │   │   │
+│   │   │   ├── infrastructure/
+│   │   │   │   ├── messaging/         # Message brokers
+│   │   │   │   │   ├── interfaces/
+│   │   │   │   │   │   └── event_bus.go
+│   │   │   │   │   ├── rabbitmq/
+│   │   │   │   │   │   ├── rabbitmq_bus.go
+│   │   │   │   │   │   └── connection.go
+│   │   │   │   │   ├── kafka/
+│   │   │   │   │   │   ├── kafka_bus.go
+│   │   │   │   │   │   └── producer.go
+│   │   │   │   │   └── nats/
+│   │   │   │   │       └── nats_bus.go
+│   │   │   │   │
+│   │   │   │   ├── config/
+│   │   │   │   │   ├── config.go
+│   │   │   │   │   ├── env.go
+│   │   │   │   │   └── firebase_config.go
+│   │   │   │   │
+│   │   │   │   ├── logger/
+│   │   │   │   │   └── logger.go
+│   │   │   │   │
+│   │   │   │   └── metrics/
+│   │   │   │       └── prometheus.go
+│   │   │   │
+│   │   │   └── utils/
+│   │   │       ├── validator.go
+│   │   │       └── crypto.go
+│   │   │
+│   │   ├── proto/                      # Auth service protobuf
+│   │   │   └── auth/
+│   │   │       └── v1/
+│   │   │           └── auth.proto
+│   │   │
+│   │   ├── cmd/
+│   │   │   └── main.go
+│   │   │
+│   │   ├── migrations/
+│   │   │   └── 001_users.sql
+│   │   │
+│   │   ├── go.mod
+│   │   ├── Dockerfile
+│   │   ├── .env.example
+│   │   └── Makefile
+│   │
+│   ├── expense-service/                # 2. Expense Service (gRPC + Events)
+│   │   ├── internal/
+│   │   │   ├── domain/
+│   │   │   │   ├── entities/
+│   │   │   │   │   ├── expense.go
+│   │   │   │   │   ├── category.go
+│   │   │   │   │   └── budget.go
+│   │   │   │   ├── valueobjects/
+│   │   │   │   │   └── money.go
+│   │   │   │   ├── enums/
+│   │   │   │   │   └── expense_category.go
+│   │   │   │   └── errors/
+│   │   │   │       └── expense_errors.go
+│   │   │   │
+│   │   │   ├── storage/
+│   │   │   ├── core/
+│   │   │   │   ├── services/
+│   │   │   │   │   ├── expense_service.go
+│   │   │   │   │   ├── category_service.go
+│   │   │   │   │   └── report_service.go
+│   │   │   │   ├── aggregates/
+│   │   │   │   │   └── financial_aggregate.go
+│   │   │   │   └── events/
+│   │   │   │       ├── expense_created.go
+│   │   │   │       ├── expense_updated.go
+│   │   │   │       └── budget_exceeded.go
+│   │   │   │
+│   │   │   ├── api/
+│   │   │   │   ├── grpc/
+│   │   │   │   │   ├── server.go
+│   │   │   │   │   ├── handlers/
+│   │   │   │   │   │   ├── expense_handler.go
+│   │   │   │   │   │   └── category_handler.go
+│   │   │   │   │   └── interceptors/
+│   │   │   │   │       └── auth_interceptor.go
+│   │   │   │   ├── events/
+│   │   │   │   │   └── publisher.go
+│   │   │   │   └── clients/
+│   │   │   │       └── auth_client.go
+│   │   │   │
+│   │   │   └── infrastructure/
+│   │   │       ├── messaging/
+│   │   │       └── config/
+│   │   │
+│   │   ├── proto/
+│   │   │   └── expense/
+│   │   │       └── v1/
+│   │   │           ├── expense.proto
+│   │   │           └── category.proto
+│   │   │
+│   │   ├── cmd/
+│   │   ├── migrations/
+│   │   ├── go.mod
+│   │   ├── Dockerfile
+│   │   └── .env.example
+│   │
+│   ├── portfolio-service/              # 3. Portfolio Service (gRPC + Events)
+│   │   ├── internal/
+│   │   │   ├── domain/
+│   │   │   │   ├── entities/
+│   │   │   │   │   ├── investment.go
+│   │   │   │   │   ├── mutual_fund.go
+│   │   │   │   │   ├── equity.go
+│   │   │   │   │   └── portfolio.go
+│   │   │   │   ├── valueobjects/
+│   │   │   │   │   ├── nav.go
+│   │   │   │   │   └── returns.go
+│   │   │   │   ├── enums/
+│   │   │   │   │   └── asset_type.go
+│   │   │   │   └── errors/
+│   │   │   │       └── portfolio_errors.go
+│   │   │   │
+│   │   │   ├── storage/
+│   │   │   ├── core/
+│   │   │   │   ├── services/
+│   │   │   │   │   ├── portfolio_service.go
+│   │   │   │   │   ├── investment_service.go
+│   │   │   │   │   └── performance_service.go
+│   │   │   │   ├── aggregates/
+│   │   │   │   │   └── portfolio_aggregate.go
+│   │   │   │   └── events/
+│   │   │   │       ├── investment_added.go
+│   │   │   │       ├── portfolio_updated.go
+│   │   │   │       └── performance_calculated.go
+│   │   │   │
+│   │   │   ├── api/
+│   │   │   │   ├── grpc/
+│   │   │   │   │   ├── server.go
+│   │   │   │   │   ├── handlers/
+│   │   │   │   │   │   ├── portfolio_handler.go
+│   │   │   │   │   │   ├── investment_handler.go
+│   │   │   │   │   │   └── mutual_fund_handler.go
+│   │   │   │   │   └── interceptors/
+│   │   │   │   │       └── auth_interceptor.go
+│   │   │   │   ├── events/
+│   │   │   │   │   └── publisher.go
+│   │   │   │   └── clients/
+│   │   │   │       └── auth_client.go
+│   │   │   │
+│   │   │   └── infrastructure/
+│   │   │       ├── messaging/
+│   │   │       └── config/
+│   │   │
+│   │   ├── proto/
+│   │   │   └── portfolio/
+│   │   │       └── v1/
+│   │   │           ├── portfolio.proto
+│   │   │           ├── investment.proto
+│   │   │           └── mutual_fund.proto
+│   │   │
+│   │   ├── cmd/
+│   │   ├── migrations/
+│   │   ├── go.mod
+│   │   ├── Dockerfile
+│   │   └── .env.example
+│   │
+│   └── api-gateway/                    # API Gateway (HTTP/JSON -> gRPC)
+│       ├── internal/
+│       │   ├── gateway/
+│       │   │   ├── handlers/
+│       │   │   │   ├── auth_handler.go
+│       │   │   │   ├── expense_handler.go
+│       │   │   │   └── portfolio_handler.go
+│       │   │   ├── middleware/
+│       │   │   │   ├── auth.go
+│       │   │   │   ├── logging.go
+│       │   │   │   └── recovery.go
+│       │   │   └── routes.go
+│       │   │
+│       │   ├── grpc/
+│       │   │   ├── clients/
+│       │   │   │   ├── auth_client.go
+│       │   │   │   ├── expense_client.go
+│       │   │   │   └── portfolio_client.go
+│       │   │   └── pool/
+│       │   │       └── connection_pool.go
+│       │   │
+│       │   ├── events/                 # Gateway can also publish events
+│       │   │   └── gateway_events.go
+│       │   │
+│       │   ├── server/
+│       │   │   └── server.go
+│       │   │
+│       │   └── config/
+│       │       └── config.go
+│       │
+│       ├── proto/
+│       │   └── (symlink to ../../libs/proto/)
+│       │
+│       ├── cmd/
+│       │   └── main.go
+│       │
+│       ├── go.mod
+│       └── Dockerfile
+│
+├── libs/                              # Shared libraries
+│   ├── proto/                         # Shared protobuf definitions
+│   │   ├── go.mod
+│   │   ├── shared/
+│   │   │   └── v1/
+│   │   │       ├── common.proto
+│   │   │       ├── money.proto
+│   │   │       ├── auth.proto
+│   │   │       └── events.proto      # NEW: Event definitions
+│   │   ├── auth/
+│   │   │   └── v1/
+│   │   │       └── auth.proto
+│   │   ├── expense/
+│   │   │   └── v1/
+│   │   │       └── expense.proto
+│   │   └── portfolio/
+│   │       └── v1/
+│   │           └── portfolio.proto
+│   │
+│   ├── common/                        # Common utilities
+│   │   ├── go.mod
+│   │   ├── timeutil/
+│   │   │   ├── time_convert.go
+│   │   │   ├── time_format.go
+│   │   │   └── timezone.go
+│   │   ├── money/
+│   │   │   ├── money_convert.go
+│   │   │   ├── currency.go
+│   │   │   └── exchange_rate.go
+│   │   ├── math/
+│   │   │   ├── calculator.go
+│   │   │   ├── percentage.go
+│   │   │   └── statistics.go
+│   │   ├── validation/
+│   │   │   ├── validator.go
+│   │   │   └── rules.go
+│   │   └── events/                    # NEW: Shared event utilities
+│   │       ├── event.go
+│   │       ├── serializer.go
+│   │       └── validator.go
+│   │
+│   ├── auth-client/                   # Shared auth client
+│   │   ├── go.mod
+│   │   ├── client.go
+│   │   ├── middleware.go
+│   │   └── jwt.go
+│   │
+│   └── messaging/                     # NEW: Shared messaging library
+│       ├── go.mod
+│       ├── interfaces/
+│       │   └── event_bus.go
+│       ├── rabbitmq/
+│       │   ├── client.go
+│       │   └── config.go
+│       ├── kafka/
+│       │   ├── client.go
+│       │   └── config.go
+│       └── nats/
+│           ├── client.go
+│           └── config.go
+│
+├── events/                            # NEW: Centralized event definitions
+│   ├── user-events/                   # User-related events
+│   │   ├── user_registered.json
+│   │   ├── user_logged_in.json
+│   │   ├── password_changed.json
+│   │   └── email_verified.json
+│   ├── expense-events/                # Expense-related events
+│   │   ├── expense_created.json
+│   │   ├── expense_updated.json
+│   │   └── budget_exceeded.json
+│   └── portfolio-events/              # Portfolio-related events
+│       ├── investment_added.json
+│       ├── portfolio_updated.json
+│       └── performance_calculated.json
+│
+├── infra/                             # Infrastructure
+│   ├── docker-compose.yml
+│   ├── docker-compose.events.yml      # NEW: Event infrastructure
+│   ├── kubernetes/
+│   │   ├── namespaces/
+│   │   ├── deployments/
+│   │   │   ├── auth-service.yaml
+│   │   │   ├── expense-service.yaml
+│   │   │   ├── portfolio-service.yaml
+│   │   │   ├── api-gateway.yaml
+│   │   │   └── event-processor.yaml   # NEW: Event processor
+│   │   ├── services/
+│   │   └── ingress/
+│   │       └── gateway.yaml
+│   └── terraform/
+│       ├── main.tf
+│       └── variables.tf
+│
+├── scripts/
+│   ├── generate-proto.sh
+│   ├── generate-events.sh             # NEW: Generate event code
+│   ├── docker-build.sh
+│   └── deploy.sh
+│
+├── tests/
+│   ├── unit/
+│   ├── integration/
+│   ├── e2e/
+│   │   ├── auth/
+│   │   ├── expense/
+│   │   └── portfolio/
+│   └── events/                        # NEW: Event tests
+│       └── event_test.go
+│
+├── .gitlab-ci.yml
+├── Makefile
+└── README.md
+
+1. Event Flow Pattern
+
+┌─────────────┐     gRPC (sync)    ┌─────────────┐
+│ API Gateway │ ─────────────────► │ Auth Service│
+└─────────────┘                    └─────────────┘
+         │                               │
+         │ Events (async)                │ Events (async)
+         ▼                               ▼
+┌─────────────────┐           ┌─────────────────────┐
+│ Message Broker  │◄──────────┤  Event Publishers   │
+│ (RabbitMQ/Kafka)│           └─────────────────────┘
+└─────────────────┘
+         │
+         │ Events (async)
+         ▼
+┌─────────────────┐     ┌─────────────────┐
+│ Expense Service │     │ Portfolio Service│
+│  (Consumer)     │     │   (Consumer)    │
+└─────────────────┘     └─────────────────┘
+
+
+2. Communication Patterns
+
+Operation	Pattern	Transport
+Login/Register	gRPC (sync)	Immediate response
+Get User Data	gRPC (sync)	Immediate response
+Validate Token	gRPC (sync)	Immediate response
+User Registered	Event (async)	Message broker
+Password Changed	Event (async)	Message broker
+Audit Logging	Event (async)	Message broker
+Email Notifications	Event (async)	Message broker
+
+
+Tech Stack
+database:
+  postgresql: ✅
+  driver: pgx/v5 ✅
+  orm: sqlc ✅
+
+api:
+  grpc: ✅
+  http_router: chi ✅
+  validation: validator/v10 ✅
+  docs: protoc-gen-openapiv2
+
+config:
+  viper: ✅
+  envconfig: ✅ (add)
+
+logging:
+  zerolog: ✅ (faster than Zap)
+
+errors:
+  pkg/errors: ✅ (add)
+
+events:
+  message_broker: RabbitMQ ✅ (start with)
+  event_format: CloudEvents ✅
+
+monitoring:
+  metrics: Prometheus ✅
+  tracing: OpenTelemetry ✅ (optional)
+
+testing:
+  unit: testify ✅
+  mocks: gomock ✅
+  integration: testcontainers ✅
+
+
+Updated Project Structure with Enhanced Stack
+auth-service/
+├── internal/
+│   ├── config/                      # Enhanced config management
+│   │   ├── config.go               # Main config structs
+│   │   ├── loader.go               # Viper + envconfig loader
+│   │   ├── validator.go            # Config validation
+│   │   ├── database.go
+│   │   ├── redis.go
+│   │   ├── messaging.go
+│   │   ├── auth.go
+│   │   ├── monitoring.go           # Prometheus/OpenTelemetry config
+│   │   └── firebase.go
+│   │
+│   ├── domain/                     # Domain layer (unchanged)
+│   │   ├── entities/
+│   │   ├── valueobjects/
+│   │   ├── enums/
+│   │   ├── errors/
+│   │   └── events/
+│   │
+│   ├── storage/                    # Storage layer
+│   │   ├── interfaces/
+│   │   ├── postgres/
+│   │   │   ├── store.go
+│   │   │   ├── repositories/
+│   │   │   ├── sqlc/
+│   │   │   ├── errors/
+│   │   │   └── connection.go
+│   │   └── cache/
+│   │       └── redis_cache.go
+│   │
+│   ├── auth/                       # Auth providers
+│   │   ├── interfaces/
+│   │   ├── providers/
+│   │   │   ├── firebase/
+│   │   │   └── jwt/
+│   │   └── factory/
+│   │
+│   ├── core/                       # Core business logic
+│   │   ├── services/
+│   │   ├── ports/
+│   │   ├── aggregates/
+│   │   └── events/
+│   │
+│   ├── api/                        # API layer
+│   │   ├── grpc/
+│   │   │   ├── server.go
+│   │   │   ├── handlers/
+│   │   │   └── interceptors/
+│   │   ├── events/
+│   │   │   ├── publisher.go
+│   │   │   └── user_events_publisher.go
+│   │   └── health/
+│   │       ├── grpc_health.go
+│   │       └── http_health.go
+│   │
+│   ├── infrastructure/             # Enhanced infrastructure
+│   │   ├── logger/
+│   │   │   ├── zerolog.go
+│   │   │   ├── config.go
+│   │   │   └── middleware.go
+│   │   │
+│   │   ├── validator/
+│   │   │   ├── validator.go        # validator/v10 wrapper
+│   │   │   └── custom_validators.go
+│   │   │
+│   │   ├── messaging/              # CloudEvents + RabbitMQ
+│   │   │   ├── interfaces/
+│   │   │   │   └── event_bus.go
+│   │   │   ├── cloudevents/        # CloudEvents implementation
+│   │   │   │   ├── cloudevents.go
+│   │   │   │   ├── serializer.go
+│   │   │   │   └── validator.go
+│   │   │   ├── rabbitmq/
+│   │   │   │   ├── rabbitmq_bus.go
+│   │   │   │   ├── connection.go
+│   │   │   │   └── config.go
+│   │   │   └── kafka/              # Future support
+│   │   │
+│   │   ├── monitoring/             # Prometheus + OpenTelemetry
+│   │   │   ├── metrics/
+│   │   │   │   ├── prometheus.go
+│   │   │   │   ├── collector.go
+│   │   │   │   └── middleware.go
+│   │   │   ├── tracing/
+│   │   │   │   ├── opentelemetry.go
+│   │   │   │   ├── tracer.go
+│   │   │   │   └── middleware.go
+│   │   │   └── profiling/
+│   │   │       └── pprof.go
+│   │   │
+│   │   └── errors/                 # pkg/errors wrapper
+│   │       ├── errors.go
+│   │       ├── handler.go
+│   │       └── middleware.go
+│   │
+│   └── pkg/                        # Public packages
+│       ├── errors/
+│       │   └── api_errors.go
+│       └── utils/
+│           ├── crypto.go
+│           └── validation.go
+│
+├── proto/                          # Protobuf definitions
+│   └── auth/
+│       └── v1/
+│           ├── auth.proto
+│           └── events.proto
+│
+├── sql/                            # SQL for sqlc
+│   ├── schema/
+│   │   └── 001_users.sql
+│   ├── queries/
+│   │   ├── users.sql
+│   │   └── sessions.sql
+│   └── sqlc.yaml
+│
+├── migrations/                     # Database migrations
+│   └── 001_users.sql
+│
+├── cmd/                           # Application entry points
+│   ├── api/
+│   │   └── main.go
+│   ├── migrate/
+│   │   └── main.go
+│   └── worker/
+│       └── main.go
+│
+├── tests/                         # Enhanced testing
+│   ├── unit/
+│   │   ├── core/
+│   │   ├── storage/
+│   │   └── api/
+│   ├── integration/
+│   │   ├── auth_integration_test.go
+│   │   └── testcontainers/
+│   │       ├── postgres.go
+│   │       ├── redis.go
+│   │       └── rabbitmq.go
+│   ├── e2e/
+│   │   └── auth_e2e_test.go
+│   └── mocks/
+│       ├── user_repository_mock.go
+│       └── auth_provider_mock.go
+│
+├── deployments/                   # Deployment configs
+│   ├── docker/
+│   │   ├── Dockerfile.api
+│   │   ├── Dockerfile.migrate
+│   │   └── Dockerfile.worker
+│   └── kubernetes/
+│       ├── deployment.yaml
+│       └── service.yaml
+│
+├── scripts/                       # Build scripts
+│   ├── generate-proto.sh
+│   ├── generate-sqlc.sh
+│   └── generate-mocks.sh
+│
+├── .env.example
+├── .env.local
+├── .env.test
+├── .gitignore
+├── Makefile
+├── go.mod
+├── go.sum
+├── docker-compose.yml
+├── docker-compose.test.yml
+└── README.md
+
+
+File List (85 files total):
+Phase 1: Foundation (25 files)
+text
+1. go.mod
+2. Makefile
+3. .env.example
+4. .env.local
+5. .env.test
+6. .gitignore
+7. README.md
+8. docker-compose.yml
+9. docker-compose.test.yml
+10. internal/config/config.go
+11. internal/config/loader.go
+12. internal/config/validator.go
+13. internal/config/database.go
+14. internal/config/redis.go
+15. internal/config/messaging.go
+16. internal/config/auth.go
+17. internal/config/monitoring.go
+18. internal/config/firebase.go
+19. internal/infrastructure/logger/zerolog.go
+20. internal/infrastructure/logger/config.go
+21. internal/infrastructure/logger/middleware.go
+22. internal/infrastructure/errors/errors.go
+23. internal/infrastructure/errors/handler.go
+24. internal/infrastructure/errors/middleware.go
+25. internal/pkg/errors/api_errors.go
+Phase 2: Database & Storage (15 files)
+text
+26. sql/schema/001_users.sql
+27. sql/queries/users.sql
+28. sql/queries/sessions.sql
+29. sql/sqlc.yaml
+30. migrations/001_users.sql
+31. internal/storage/interfaces/repositories/user_repository.go
+32. internal/storage/interfaces/repositories/session_repository.go
+33. internal/storage/interfaces/store.go
+34. internal/storage/postgres/store.go
+35. internal/storage/postgres/repositories/user_repository.go
+36. internal/storage/postgres/repositories/session_repository.go
+37. internal/storage/postgres/errors/converter.go
+38. internal/storage/postgres/errors/errors.go
+39. internal/storage/postgres/connection.go
+40. internal/storage/cache/redis_cache.go
+Phase 3: Domain & Core (15 files)
+text
+41. internal/domain/entities/user.go
+42. internal/domain/entities/session.go
+43. internal/domain/valueobjects/email.go
+44. internal/domain/valueobjects/password.go
+45. internal/domain/enums/user_status.go
+46. internal/domain/enums/auth_provider.go
+47. internal/domain/errors/auth_errors.go
+48. internal/domain/events/user_registered.go
+49. internal/domain/events/user_logged_in.go
+50. internal/domain/events/password_changed.go
+51. internal/auth/interfaces/auth_provider.go
+52. internal/auth/providers/firebase/firebase_provider.go
+53. internal/auth/providers/jwt/jwt_provider.go
+54. internal/auth/factory/provider_factory.go
+55. internal/core/services/auth_service.go
+Phase 4: gRPC API (10 files)
+text
+56. proto/auth/v1/auth.proto
+57. proto/auth/v1/events.proto
+58. internal/api/grpc/server.go
+59. internal/api/grpc/handlers/auth_handler.go
+60. internal/api/grpc/interceptors/logging.go
+61. internal/api/grpc/interceptors/recovery.go
+62. internal/api/grpc/interceptors/auth.go
+63. internal/api/grpc/interceptors/metrics.go
+64. internal/api/health/grpc_health.go
+65. internal/api/health/http_health.go
+Phase 5: Events & Messaging (10 files)
+text
+66. internal/api/events/publisher.go
+67. internal/api/events/user_events_publisher.go
+68. internal/infrastructure/messaging/interfaces/event_bus.go
+69. internal/infrastructure/messaging/cloudevents/cloudevents.go
+70. internal/infrastructure/messaging/cloudevents/serializer.go
+71. internal/infrastructure/messaging/cloudevents/validator.go
+72. internal/infrastructure/messaging/rabbitmq/rabbitmq_bus.go
+73. internal/infrastructure/messaging/rabbitmq/connection.go
+74. internal/infrastructure/messaging/rabbitmq/config.go
+75. internal/infrastructure/validator/validator.go
+Phase 6: Monitoring & Observability (5 files)
+text
+76. internal/infrastructure/monitoring/metrics/prometheus.go
+77. internal/infrastructure/monitoring/metrics/collector.go
+78. internal/infrastructure/monitoring/metrics/middleware.go
+79. internal/infrastructure/monitoring/tracing/opentelemetry.go
+80. internal/infrastructure/monitoring/tracing/middleware.go
+Phase 7: Application Entry Points (5 files)
+text
+81. cmd/api/main.go
+82. cmd/migrate/main.go
+83. cmd/worker/main.go
+84. deployments/docker/Dockerfile.api
+85. deployments/docker/Dockerfile.migrate
+
+
+Updated Project Structure with Enhanced Stack
+text
+auth-service/
+├── internal/
+│   ├── config/                      # Enhanced config management
+│   │   ├── config.go               # Main config structs
+│   │   ├── loader.go               # Viper + envconfig loader
+│   │   ├── validator.go            # Config validation
+│   │   ├── database.go
+│   │   ├── redis.go
+│   │   ├── messaging.go
+│   │   ├── auth.go
+│   │   ├── monitoring.go           # Prometheus/OpenTelemetry config
+│   │   └── firebase.go
+│   │
+│   ├── domain/                     # Domain layer (unchanged)
+│   │   ├── entities/
+│   │   ├── valueobjects/
+│   │   ├── enums/
+│   │   ├── errors/
+│   │   └── events/
+│   │
+│   ├── storage/                    # Storage layer
+│   │   ├── interfaces/
+│   │   ├── postgres/
+│   │   │   ├── store.go
+│   │   │   ├── repositories/
+│   │   │   ├── sqlc/
+│   │   │   ├── errors/
+│   │   │   └── connection.go
+│   │   └── cache/
+│   │       └── redis_cache.go
+│   │
+│   ├── auth/                       # Auth providers
+│   │   ├── interfaces/
+│   │   ├── providers/
+│   │   │   ├── firebase/
+│   │   │   └── jwt/
+│   │   └── factory/
+│   │
+│   ├── core/                       # Core business logic
+│   │   ├── services/
+│   │   ├── ports/
+│   │   ├── aggregates/
+│   │   └── events/
+│   │
+│   ├── api/                        # API layer
+│   │   ├── grpc/
+│   │   │   ├── server.go
+│   │   │   ├── handlers/
+│   │   │   └── interceptors/
+│   │   ├── events/
+│   │   │   ├── publisher.go
+│   │   │   └── user_events_publisher.go
+│   │   └── health/
+│   │       ├── grpc_health.go
+│   │       └── http_health.go
+│   │
+│   ├── infrastructure/             # Enhanced infrastructure
+│   │   ├── logger/
+│   │   │   ├── zerolog.go
+│   │   │   ├── config.go
+│   │   │   └── middleware.go
+│   │   │
+│   │   ├── validator/
+│   │   │   ├── validator.go        # validator/v10 wrapper
+│   │   │   └── custom_validators.go
+│   │   │
+│   │   ├── messaging/              # CloudEvents + RabbitMQ
+│   │   │   ├── interfaces/
+│   │   │   │   └── event_bus.go
+│   │   │   ├── cloudevents/        # CloudEvents implementation
+│   │   │   │   ├── cloudevents.go
+│   │   │   │   ├── serializer.go
+│   │   │   │   └── validator.go
+│   │   │   ├── rabbitmq/
+│   │   │   │   ├── rabbitmq_bus.go
+│   │   │   │   ├── connection.go
+│   │   │   │   └── config.go
+│   │   │   └── kafka/              # Future support
+│   │   │
+│   │   ├── monitoring/             # Prometheus + OpenTelemetry
+│   │   │   ├── metrics/
+│   │   │   │   ├── prometheus.go
+│   │   │   │   ├── collector.go
+│   │   │   │   └── middleware.go
+│   │   │   ├── tracing/
+│   │   │   │   ├── opentelemetry.go
+│   │   │   │   ├── tracer.go
+│   │   │   │   └── middleware.go
+│   │   │   └── profiling/
+│   │   │       └── pprof.go
+│   │   │
+│   │   └── errors/                 # pkg/errors wrapper
+│   │       ├── errors.go
+│   │       ├── handler.go
+│   │       └── middleware.go
+│   │
+│   └── pkg/                        # Public packages
+│       ├── errors/
+│       │   └── api_errors.go
+│       └── utils/
+│           ├── crypto.go
+│           └── validation.go
+│
+├── proto/                          # Protobuf definitions
+│   └── auth/
+│       └── v1/
+│           ├── auth.proto
+│           └── events.proto
+│
+├── sql/                            # SQL for sqlc
+│   ├── schema/
+│   │   └── 001_users.sql
+│   ├── queries/
+│   │   ├── users.sql
+│   │   └── sessions.sql
+│   └── sqlc.yaml
+│
+├── migrations/                     # Database migrations
+│   └── 001_users.sql
+│
+├── cmd/                           # Application entry points
+│   ├── api/
+│   │   └── main.go
+│   ├── migrate/
+│   │   └── main.go
+│   └── worker/
+│       └── main.go
+│
+├── tests/                         # Enhanced testing
+│   ├── unit/
+│   │   ├── core/
+│   │   ├── storage/
+│   │   └── api/
+│   ├── integration/
+│   │   ├── auth_integration_test.go
+│   │   └── testcontainers/
+│   │       ├── postgres.go
+│   │       ├── redis.go
+│   │       └── rabbitmq.go
+│   ├── e2e/
+│   │   └── auth_e2e_test.go
+│   └── mocks/
+│       ├── user_repository_mock.go
+│       └── auth_provider_mock.go
+│
+├── deployments/                   # Deployment configs
+│   ├── docker/
+│   │   ├── Dockerfile.api
+│   │   ├── Dockerfile.migrate
+│   │   └── Dockerfile.worker
+│   └── kubernetes/
+│       ├── deployment.yaml
+│       └── service.yaml
+│
+├── scripts/                       # Build scripts
+│   ├── generate-proto.sh
+│   ├── generate-sqlc.sh
+│   └── generate-mocks.sh
+│
+├── .env.example
+├── .env.local
+├── .env.test
+├── .gitignore
+├── Makefile
+├── go.mod
+├── go.sum
+├── docker-compose.yml
+├── docker-compose.test.yml
+└── README.md
+Key Changes from Original Structure:
+1. Enhanced Config Management
+Added config/loader.go (Viper + envconfig)
+
+Added config/validator.go (config validation)
+
+Added config/monitoring.go (Prometheus/OpenTelemetry config)
+
+2. CloudEvents Support
+Added infrastructure/messaging/cloudevents/ directory
+
+CloudEvents serializer and validator
+
+Standardized event format
+
+3. OpenTelemetry Integration
+Added infrastructure/monitoring/tracing/
+
+Distributed tracing support
+
+gRPC/HTTP middleware for tracing
+
+4. Improved Error Handling
+Added infrastructure/errors/ with pkg/errors
+
+Structured error handling
+
+Error middleware
+
+5. Enhanced Testing
+Added tests/integration/testcontainers/
+
+Containerized testing for Postgres, Redis, RabbitMQ
+
+Better test isolation
+
+6. Multiple Entry Points
+Separate cmd/api/, cmd/migrate/, cmd/worker/
+
+Specialized Dockerfiles for each
+
+7. Better Validation
+infrastructure/validator/ with validator/v10
+
+Custom validation rules
+
+Integration with protobuf validation
+
+Updated File List (85 files total):
+Phase 1: Foundation (25 files)
+text
+1. go.mod
+2. Makefile
+3. .env.example
+4. .env.local
+5. .env.test
+6. .gitignore
+7. README.md
+8. docker-compose.yml
+9. docker-compose.test.yml
+10. internal/config/config.go
+11. internal/config/loader.go
+12. internal/config/validator.go
+13. internal/config/database.go
+14. internal/config/redis.go
+15. internal/config/messaging.go
+16. internal/config/auth.go
+17. internal/config/monitoring.go
+18. internal/config/firebase.go
+19. internal/infrastructure/logger/zerolog.go
+20. internal/infrastructure/logger/config.go
+21. internal/infrastructure/logger/middleware.go
+22. internal/infrastructure/errors/errors.go
+23. internal/infrastructure/errors/handler.go
+24. internal/infrastructure/errors/middleware.go
+25. internal/pkg/errors/api_errors.go
+Phase 2: Database & Storage (15 files)
+text
+26. sql/schema/001_users.sql
+27. sql/queries/users.sql
+28. sql/queries/sessions.sql
+29. sql/sqlc.yaml
+30. migrations/001_users.sql
+31. internal/storage/interfaces/repositories/user_repository.go
+32. internal/storage/interfaces/repositories/session_repository.go
+33. internal/storage/interfaces/store.go
+34. internal/storage/postgres/store.go
+35. internal/storage/postgres/repositories/user_repository.go
+36. internal/storage/postgres/repositories/session_repository.go
+37. internal/storage/postgres/errors/converter.go
+38. internal/storage/postgres/errors/errors.go
+39. internal/storage/postgres/connection.go
+40. internal/storage/cache/redis_cache.go
+Phase 3: Domain & Core (15 files)
+text
+41. internal/domain/entities/user.go
+42. internal/domain/entities/session.go
+43. internal/domain/valueobjects/email.go
+44. internal/domain/valueobjects/password.go
+45. internal/domain/enums/user_status.go
+46. internal/domain/enums/auth_provider.go
+47. internal/domain/errors/auth_errors.go
+48. internal/domain/events/user_registered.go
+49. internal/domain/events/user_logged_in.go
+50. internal/domain/events/password_changed.go
+51. internal/auth/interfaces/auth_provider.go
+52. internal/auth/providers/firebase/firebase_provider.go
+53. internal/auth/providers/jwt/jwt_provider.go
+54. internal/auth/factory/provider_factory.go
+55. internal/core/services/auth_service.go
+Phase 4: gRPC API (10 files)
+text
+56. proto/auth/v1/auth.proto
+57. proto/auth/v1/events.proto
+58. internal/api/grpc/server.go
+59. internal/api/grpc/handlers/auth_handler.go
+60. internal/api/grpc/interceptors/logging.go
+61. internal/api/grpc/interceptors/recovery.go
+62. internal/api/grpc/interceptors/auth.go
+63. internal/api/grpc/interceptors/metrics.go
+64. internal/api/health/grpc_health.go
+65. internal/api/health/http_health.go
+Phase 5: Events & Messaging (10 files)
+text
+66. internal/api/events/publisher.go
+67. internal/api/events/user_events_publisher.go
+68. internal/infrastructure/messaging/interfaces/event_bus.go
+69. internal/infrastructure/messaging/cloudevents/cloudevents.go
+70. internal/infrastructure/messaging/cloudevents/serializer.go
+71. internal/infrastructure/messaging/cloudevents/validator.go
+72. internal/infrastructure/messaging/rabbitmq/rabbitmq_bus.go
+73. internal/infrastructure/messaging/rabbitmq/connection.go
+74. internal/infrastructure/messaging/rabbitmq/config.go
+75. internal/infrastructure/validator/validator.go
+Phase 6: Monitoring & Observability (5 files)
+text
+76. internal/infrastructure/monitoring/metrics/prometheus.go
+77. internal/infrastructure/monitoring/metrics/collector.go
+78. internal/infrastructure/monitoring/metrics/middleware.go
+79. internal/infrastructure/monitoring/tracing/opentelemetry.go
+80. internal/infrastructure/monitoring/tracing/middleware.go
+Phase 7: Application Entry Points (5 files)
+text
+81. cmd/api/main.go
+82. cmd/migrate/main.go
+83. cmd/worker/main.go
+84. deployments/docker/Dockerfile.api
+85. deployments/docker/Dockerfile.migrate
+Benefits of This Enhanced Stack:
+Production Ready: All monitoring, tracing, logging in place
+
+Cloud Native: CloudEvents, OpenTelemetry standards
+
+Better DevEx: Improved config management, validation
+
+Testing: testcontainers for real integration tests
+
+Scalable: Separate workers, multiple entry points
+
+Maintainable: Proper error handling, structured logging
