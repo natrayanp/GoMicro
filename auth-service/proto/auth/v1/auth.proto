@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package auth.v1;
 
-option go_package = "github.com/natrayanp/auth-service/proto/auth/v1";
+option go_package = "github.com/natrayanp/GoMicro/auth-service/proto/auth/v1";
 
 service AuthService {
   rpc Register(RegisterRequest) returns (RegisterResponse);

@@ -22,7 +22,7 @@ coverage.out
 .env.local
 
 # Generated code (will be regenerated in Docker)
-*.pb.go
+!auth-service/proto/**/*.pb.go
 internal/storage/postgres/sqlc/
 
 # Air tmp directory

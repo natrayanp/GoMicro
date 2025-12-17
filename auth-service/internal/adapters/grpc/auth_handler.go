@@ -4,9 +4,9 @@ import (
 	"context"
 	"log"
 
-	"github.com/natrayanp/auth-service/internal/domain"
-	"github.com/natrayanp/auth-service/internal/ports"
-	pb "github.com/natrayanp/auth-service/proto/auth/v1"
+	"github.com/natrayanp/GoMicro/auth-service/internal/domain"
+	"github.com/natrayanp/GoMicro/auth-service/internal/ports"
+	pb "github.com/natrayanp/GoMicro/auth-service/proto/auth/v1"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

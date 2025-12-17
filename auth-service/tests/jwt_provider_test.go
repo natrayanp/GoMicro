@@ -4,7 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/natrayanp/auth-service/internal/auth/jwt"
+	"github.com/natrayanp/GoMicro/auth-service/internal/auth/jwt"
+
 	"github.com/stretchr/testify/assert"
 )
 

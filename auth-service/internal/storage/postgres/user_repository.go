@@ -5,9 +5,9 @@ import (
 
 	"github.com/jackc/pgx/v5/pgtype"
 
-	"github.com/natrayanp/auth-service/internal/domain"
-	"github.com/natrayanp/auth-service/internal/ports"
-	"github.com/natrayanp/auth-service/internal/storage/postgres/sqlc"
+	"github.com/natrayanp/GoMicro/auth-service/internal/domain"
+	"github.com/natrayanp/GoMicro/auth-service/internal/ports"
+	"github.com/natrayanp/GoMicro/auth-service/internal/storage/postgres/sqlc"
 )
 
 type UserRepository struct {

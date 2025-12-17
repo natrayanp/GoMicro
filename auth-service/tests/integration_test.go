@@ -4,8 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/natrayanp/auth-service/internal/config"
-	"github.com/natrayanp/auth-service/internal/storage/postgres"
+	"github.com/natrayanp/GoMicro/auth-service/internal/config"
+	"github.com/natrayanp/GoMicro/auth-service/internal/storage/postgres"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"

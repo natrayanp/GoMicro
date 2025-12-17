@@ -11,7 +11,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./sql/schema:/docker-entrypoint-initdb.d
+      - ./auth-service/sql/schema:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -21,9 +21,11 @@ services:
       - auth-network
 
   auth-service:
+    
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: auth-service/Dockerfile.dev
+    working_dir: /app/auth-service
     ports:
       - "50051:50051"
       - "8080:8080"
@@ -37,7 +39,6 @@ services:
       - SERVER_HOST=0.0.0.0
       - SERVER_PORT=50051
     volumes:
-      - .:/app
       - go-mod-cache:/go/pkg/mod
       - go-build-cache:/root/.cache/go-build
     depends_on:
@@ -45,25 +46,6 @@ services:
         condition: service_healthy
     networks:
       - auth-network
-    command: >
-      sh -c '
-        # Check if any proto files exist
-        if ls proto/auth/v1/*.proto >/dev/null 2>&1; then
-          echo "Installing protoc and generating code..." &&
-          apk add --no-cache protoc protobuf-dev &&
-          go install google.golang.org/protobuf/cmd/protoc-gen-go@latest &&
-          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest &&
-          go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest &&
-          protoc --go_out=. --go_opt=paths=source_relative \
-                 --go-grpc_out=. --go-grpc_opt=paths=source_relative \
-                 proto/auth/v1/*.proto &&
-          sqlc generate
-        else
-          echo "No proto files found, skipping generation"
-        fi
-
-        air
-      '
       
 networks:
   auth-network:

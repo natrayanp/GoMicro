@@ -1,7 +1,7 @@
 package ports
 
 import (
-	"github.com/natrayanp/auth-service/internal/domain"
+	"github.com/natrayanp/GoMicro/auth-service/internal/domain"
 )
 
 type TokenProviderPort interface {

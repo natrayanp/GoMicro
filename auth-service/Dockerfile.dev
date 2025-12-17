@@ -12,9 +12,13 @@ RUN go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest \
 COPY go.mod go.sum ./
 RUN go mod download
 
-COPY . .
+COPY auth-service/ /app/auth-service/
+COPY auth-service/.air.toml /app/auth-service/.air.toml
 
-RUN protoc --go_out=. --go-grpc_out=. proto/*.proto
+WORKDIR /app/auth-service
+
+RUN ls -la /app/auth-service
+RUN protoc --go_out=. --go-grpc_out=. proto/auth/v1/*.proto
 RUN sqlc generate -f sql/sqlc.yaml
 
 EXPOSE 50051 8080

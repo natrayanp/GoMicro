@@ -4,8 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/natrayanp/auth-service/internal/domain"
-	"github.com/natrayanp/auth-service/internal/ports"
+	"github.com/natrayanp/GoMicro/auth-service/internal/domain"
+	"github.com/natrayanp/GoMicro/auth-service/internal/ports"
+
 	"golang.org/x/crypto/bcrypt"
 )
 

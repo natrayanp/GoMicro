@@ -2,7 +2,7 @@ Updated Hybrid Architecture Structure
 
 your-org/
 ├── apps/                              # Microservices applications
-│   ├── github.com/natrayanp/auth-service/                  # 1. Authentication Service (gRPC + Events)
+│   ├── github.com/natrayanp/GoMicro/auth-service/                  # 1. Authentication Service (gRPC + Events)
 │   │   ├── internal/
 │   │   │   ├── domain/
 │   │   │   │   ├── entities/
@@ -468,7 +468,7 @@ testing:
 
 
 Updated Project Structure with Enhanced Stack
-github.com/natrayanp/auth-service/
+github.com/natrayanp/GoMicro/auth-service/
 ├── internal/
 │   ├── config/                      # Enhanced config management
 │   │   ├── config.go               # Main config structs
@@ -743,7 +743,7 @@ text
 
 Updated Project Structure with Enhanced Stack
 text
-github.com/natrayanp/auth-service/
+github.com/natrayanp/GoMicro/auth-service/
 ├── internal/
 │   ├── config/                      # Enhanced config management
 │   │   ├── config.go               # Main config structs

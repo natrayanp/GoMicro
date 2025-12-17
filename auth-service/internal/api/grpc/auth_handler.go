@@ -4,7 +4,8 @@ import (
 	"context"
 	"log"
 
-	"github.com/natrayanp/auth-service/internal/core"
+	"github.com/natrayanp/GoMicro/auth-service/internal/core"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

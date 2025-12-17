@@ -7,7 +7,8 @@ import (
 	"net"
 	"strconv"
 
-	"github.com/natrayanp/auth-service/internal/config"
+	"github.com/natrayanp/GoMicro/auth-service/internal/config"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )

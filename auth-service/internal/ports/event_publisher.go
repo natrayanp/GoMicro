@@ -3,7 +3,7 @@ package ports
 import (
 	"context"
 
-	"github.com/natrayanp/auth-service/internal/domain"
+	"github.com/natrayanp/GoMicro/auth-service/internal/domain"
 )
 
 type EventPublisherPort interface {

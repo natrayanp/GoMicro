@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/natrayanp/auth-service/internal/domain"
+	"github.com/natrayanp/GoMicro/auth-service/internal/domain"
 )
 
 // UserRepository defines storage operations for users

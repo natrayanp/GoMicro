@@ -3,7 +3,7 @@ package jwt
 import (
 	"time"
 
-	"github.com/natrayanp/auth-service/internal/domain"
+	"github.com/natrayanp/GoMicro/auth-service/internal/domain"
 )
 
 func NewTokenPair(accessToken, refreshToken string, expiresIn int64) *domain.TokenPair {

@@ -8,12 +8,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/natrayanp/auth-service/internal/adapters/grpc"
-	"github.com/natrayanp/auth-service/internal/api/health"
-	"github.com/natrayanp/auth-service/internal/auth/jwt"
-	"github.com/natrayanp/auth-service/internal/config"
-	"github.com/natrayanp/auth-service/internal/core"
-	"github.com/natrayanp/auth-service/internal/storage/postgres"
+	"github.com/natrayanp/GoMicro/auth-service/internal/adapters/grpc"
+	"github.com/natrayanp/GoMicro/auth-service/internal/api/health"
+	"github.com/natrayanp/GoMicro/auth-service/internal/auth/jwt"
+	"github.com/natrayanp/GoMicro/auth-service/internal/config"
+	"github.com/natrayanp/GoMicro/auth-service/internal/core"
+	"github.com/natrayanp/GoMicro/auth-service/internal/storage/postgres"
 )
 
 func main() {

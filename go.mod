@@ -1,4 +1,4 @@
-module github.com/natrayanp/auth-service
+module github.com/natrayanp/GoMicro
 
 go 1.25.5
 
