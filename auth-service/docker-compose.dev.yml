@@ -45,9 +45,26 @@ services:
         condition: service_healthy
     networks:
       - auth-network
-    command: air -c .air.toml  # Hot reload with Air
-    # OR for standard reload: command: sh -c "go run ./cmd"
+    command: >
+      sh -c '
+        # Check if any proto files exist
+        if ls proto/auth/v1/*.proto >/dev/null 2>&1; then
+          echo "Installing protoc and generating code..." &&
+          apk add --no-cache protoc protobuf-dev &&
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@latest &&
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest &&
+          go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest &&
+          protoc --go_out=. --go_opt=paths=source_relative \
+                 --go-grpc_out=. --go-grpc_opt=paths=source_relative \
+                 proto/auth/v1/*.proto &&
+          sqlc generate
+        else
+          echo "No proto files found, skipping generation"
+        fi
 
+        air
+      '
+      
 networks:
   auth-network:
     driver: bridge
